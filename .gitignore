@@ -1,0 +1,20 @@
+# environments and builds
+.venv/
+__pycache__/
+build/
+dist/
+installer/
+
+# local user data (never commit)
+config.json
+config.tmp
+history.jsonl
+history.txt*
+flowra.log
+flowra.old.log
+.env*
+assets/sounds/
+
+# scratch
+*.wav
+*.mp3

@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flowra</title>
+<link rel="icon" href="logo.png">
+<style>
+:root{
+  --bg:#f6f6f8; --panel:#ffffff; --side:#efeff2; --text:#18181b; --muted:#6b6b76; --faint:#9a9aa5;
+  --line:#e4e4ea; --hover:#f0f0f4; --accent:#0f766e; --accent-ink:#ffffff; --accent-soft:#e3f3f1;
+  --danger:#c2410c; --focus:#0f766e55; --shadow:0 1px 2px #0000000d, 0 0 0 1px var(--line);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#111114; --panel:#18181c; --side:#141417; --text:#ececf1; --muted:#9b9ba7; --faint:#6d6d78;
+    --line:#2a2a31; --hover:#202026; --accent:#3dd6c4; --accent-ink:#06201d; --accent-soft:#163430;
+    --danger:#fb923c; --focus:#3dd6c455; --shadow:0 0 0 1px var(--line);
+  }
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font:14px/1.45 "Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;
+  display:grid;grid-template-columns:220px 1fr;-webkit-font-smoothing:antialiased}
+aside{background:var(--side);border-right:1px solid var(--line);padding:22px 12px;display:flex;flex-direction:column;gap:2px}
+.brand{display:flex;align-items:center;gap:10px;padding:0 10px 20px}
+.brand img{width:28px;height:28px;border-radius:7px}
+.brand b{font:600 16px "Segoe UI Variable Display","Segoe UI",sans-serif;letter-spacing:-.01em}
+nav a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:7px;color:var(--muted);
+  text-decoration:none;font-weight:500}
+nav a svg{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+nav a:hover{background:var(--hover);color:var(--text)}
+nav a.on{background:var(--panel);color:var(--text);box-shadow:var(--shadow)}
+.status{margin-top:auto;padding:10px;font-size:12px;color:var(--faint);display:flex;align-items:center;gap:8px}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--faint)}
+.status.ok i{background:#22c55e}
+main{overflow:auto;padding:34px 44px 60px}
+section{display:none;max-width:680px}
+section.on{display:block}
+h1{font:600 22px "Segoe UI Variable Display","Segoe UI",sans-serif;margin:0 0 4px;letter-spacing:-.015em}
+.lead{color:var(--muted);margin:0 0 26px}
+h2{font-size:12px;font-weight:600;color:var(--muted);margin:28px 0 8px;letter-spacing:.01em}
+.card{background:var(--panel);border-radius:10px;box-shadow:var(--shadow);overflow:hidden}
+.row{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:14px 18px;min-height:58px}
+.row+.row{border-top:1px solid var(--line)}
+.row .l{min-width:0}
+.row .t{font-weight:500}
+.row .d{color:var(--muted);font-size:12.5px;margin-top:1px}
+.row.col{flex-direction:column;align-items:stretch;gap:10px}
+select,input[type=text],input[type=number],textarea{font:inherit;color:var(--text);background:var(--bg);
+  border:1px solid var(--line);border-radius:7px;padding:7px 10px;outline:none}
+select{padding-right:28px;min-width:190px}
+select:focus,input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--focus)}
+textarea{width:100%;min-height:84px;resize:vertical}
+input[type=number]{width:84px}
+/* switch */
+.sw{position:relative;width:40px;height:22px;flex:none}
+.sw input{opacity:0;position:absolute;inset:0;margin:0;cursor:pointer;z-index:1}
+.sw span{position:absolute;inset:0;border-radius:11px;background:var(--line);transition:background .18s}
+.sw span::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 2px #0003;transition:transform .2s cubic-bezier(.3,.7,.4,1)}
+.sw input:checked+span{background:var(--accent)}
+.sw input:checked+span::after{transform:translateX(18px)}
+.sw input:focus-visible+span{box-shadow:0 0 0 3px var(--focus)}
+/* range */
+.rng{display:flex;align-items:center;gap:12px}
+.rng output{min-width:44px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+input[type=range]{width:200px;accent-color:var(--accent)}
+input[type=color]{width:34px;height:28px;padding:0;border:1px solid var(--line);border-radius:7px;background:none;cursor:pointer}
+input[type=color]::-webkit-color-swatch-wrapper{padding:3px}input[type=color]::-webkit-color-swatch{border:0;border-radius:4px}
+/* segmented */
+.seg{display:inline-flex;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:2px}
+.seg button{font:inherit;font-size:13px;border:0;background:none;color:var(--muted);padding:5px 12px;border-radius:6px;cursor:pointer}
+.seg button.on{background:var(--panel);color:var(--text);box-shadow:var(--shadow)}
+/* key capture */
+.key{font:500 13px "Cascadia Mono",Consolas,monospace;min-width:150px;text-align:center;padding:7px 12px;border-radius:7px;
+  border:1px solid var(--line);background:var(--bg);cursor:pointer;color:var(--text)}
+.key.cap{border-color:var(--accent);box-shadow:0 0 0 3px var(--focus);color:var(--accent)}
+/* position picker */
+.screen{position:relative;width:260px;height:152px;border-radius:9px;background:var(--bg);border:1px solid var(--line);flex:none}
+.screen::after{content:"";position:absolute;left:0;right:0;bottom:0;height:12px;border-top:1px solid var(--line);
+  border-radius:0 0 9px 9px;background:var(--hover)}
+.spot{position:absolute;width:44px;height:22px;border-radius:11px;border:0;background:none;cursor:pointer;display:grid;place-items:center}
+.spot::before{content:"";width:22px;height:5px;border-radius:3px;background:var(--faint);opacity:.45;transition:.15s}
+.spot:hover::before{opacity:.9}
+.spot.on::before{width:30px;height:7px;background:var(--accent);opacity:1}
+/* swatches */
+.sws{display:flex;gap:8px;align-items:center}
+.swc{width:26px;height:26px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;outline-offset:2px}
+.swc.on{border-color:var(--text)}
+.theme{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.theme button{border:1px solid var(--line);background:var(--bg);border-radius:9px;padding:12px 8px 9px;cursor:pointer;
+  color:var(--muted);font:inherit;font-size:12.5px;display:flex;flex-direction:column;align-items:center;gap:9px}
+.theme button.on{border-color:var(--accent);color:var(--text);box-shadow:0 0 0 3px var(--focus)}
+.pill{width:64px;height:20px;border-radius:10px;display:flex;align-items:center;gap:3px;padding:0 9px}
+.pill i{display:block;width:2px;border-radius:1px}
+.pill b{width:5px;height:5px;border-radius:50%;margin-right:4px}
+/* list editors */
+.kv{display:grid;grid-template-columns:1fr 18px 1fr 32px;gap:8px;align-items:center}
+.kv input,.kv select{width:100%;min-width:0}
+.kv .arrow{color:var(--faint);text-align:center}
+.x{border:0;background:none;color:var(--faint);cursor:pointer;border-radius:6px;height:30px;font-size:18px}
+.x:hover{background:var(--hover);color:var(--danger)}
+.btn{font:inherit;font-weight:500;border:1px solid var(--line);background:var(--panel);color:var(--text);
+  border-radius:7px;padding:7px 14px;cursor:pointer}
+.btn:hover{background:var(--hover)}
+.btn.p{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;border:1px dashed var(--line);border-radius:12px;padding:3px 10px;cursor:pointer;color:var(--muted);background:none}
+.chip:hover{border-color:var(--accent);color:var(--text)}
+/* stats + history */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.stat{background:var(--panel);box-shadow:var(--shadow);border-radius:10px;padding:14px 16px}
+.stat b{display:block;font:600 22px "Segoe UI Variable Display","Segoe UI",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.stat span{color:var(--muted);font-size:12px}
+.search{width:100%;margin-bottom:12px;padding:9px 12px}
+.hist{display:flex;flex-direction:column}
+.h{display:grid;grid-template-columns:1fr auto;gap:16px;padding:12px 18px;align-items:start}
+.h+.h{border-top:1px solid var(--line)}
+.h p{margin:0;white-space:pre-wrap;word-break:break-word}
+.h small{display:block;color:var(--faint);font-size:12px;margin-top:4px}
+.copy{opacity:0;transition:opacity .15s}
+.h:hover .copy,.copy:focus{opacity:1}
+.empty{padding:40px;text-align:center;color:var(--muted)}
+.cmd{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;font-size:13px}
+.cmd code{font:12.5px "Cascadia Mono",Consolas,monospace;background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:1px 6px;white-space:nowrap}
+.cmd span{color:var(--muted)}
+.toast{position:fixed;right:22px;bottom:20px;background:var(--text);color:var(--bg);padding:8px 14px;border-radius:8px;
+  font-size:13px;opacity:0;transform:translateY(6px);transition:.2s;pointer-events:none}
+.toast.on{opacity:1;transform:none}
+@media (max-width:760px){body{grid-template-columns:1fr}aside{display:none}main{padding:24px 16px}.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<aside>
+  <div class="brand"><img src="logo.png" alt=""><b>Flowra</b></div>
+  <nav id="nav">
+    <a href="#general"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 7.2 19.7l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3.2 14H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.3 7.2l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 3.2V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 20.8 10H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>General</a>
+    <a href="#indicator"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M10 13h4"/></svg>Indicator</a>
+    <a href="#dictation"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>Dictation</a>
+    <a href="#words"><svg viewBox="0 0 24 24"><path d="M4 7V5h16v2M9 19h6M12 5v14"/></svg>Words &amp; snippets</a>
+    <a href="#apps"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Per-app rules</a>
+    <a href="#history"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>History</a>
+  </nav>
+  <div class="status" id="status"><i></i><span>Connecting…</span></div>
+</aside>
+
+<main>
+<!-- GENERAL -->
+<section id="general">
+  <h1>General</h1>
+  <p class="lead">Hold to talk, or double-tap to talk hands-free. Changes apply instantly.</p>
+  <h2>Shortcuts</h2>
+  <div class="card">
+    <div class="row"><div class="l"><div class="t">Dictation key</div><div class="d">Hold to talk · double-tap to lock · tap again to finish · Esc cancels</div></div>
+      <button class="key" data-key="hotkey" data-single></button></div>
+    <div class="row"><div class="l"><div class="t">Paste last dictation</div><div class="d">Re-type what you said last, anywhere</div></div>
+      <button class="key" data-key="paste_last_hotkey"></button></div>
+  </div>
+  <h2>System</h2>
+  <div class="card">
+    <div class="row"><div class="l"><div class="t">Start Flowra with Windows</div><div class="d">Ready in the tray every time you sign in</div></div>
+      <label class="sw"><input type="checkbox" data-k="launch_at_startup"><span></span></label></div>
+  </div>
+  <h2>Microphone</h2>
+  <div class="card">
+    <div class="row"><div class="l"><div class="t">Input device</div></div><select data-k="microphone" id="mic"></select></div>
+    <div class="row"><div class="l"><div class="t">Boost quiet speech</div><div class="d">Lets you whisper in a quiet office or sit back from the mic</div></div>
+      <label class="sw"><input type="checkbox" data-k="boost_quiet_speech"><span></span></label></div>
+  </div>
+  <h2>Sounds</h2>
+  <div class="card">
+    <div class="row"><div class="l"><div class="t">Interface sounds</div><div class="d">Soft tones for start, stop, lock and copy</div></div>
+      <label class="sw"><input type="checkbox" data-k="sounds"><span></span></label></div>
+    <div class="row"><div class="l"><div class="t">Volume</div></div>
+      <div class="rng"><input type="range" min="5" max="100" step="5" data-k="sound_volume"><output></output></div></div>
+  </div>
+  <h2>Recognition</h2>
+  <div class="card">
+    <div class="row"><div class="l"><div class="t">Model</div><div class="d" id="modelNote"></div></div><select data-k="model" id="model"></select></div>
+    <div class="row"><div class="l"><div class="t">Language</div><div class="d">Auto-detect works across languages, a fixed language is faster</div></div>
+      <select data-k="language" id="lang"></select></div>
+    <div class="row"><div class="l"><div class="t">Free GPU memory when idle</div><div class="d">Unloads the model after this many minutes. 0 keeps it ready.</div></div>
+      <div class="rng"><input type="range" min="0" max="60" step="5" data-k="unload_after_idle_minutes"><output></output></div></div>
+  </div>
+</section>
+
+<!-- INDICATOR -->
+<section id="indicator">
+  <h1>Indicator</h1>
+  <p class="lead">A small capsule that shows when Flowra is listening. Clicks pass straight through it, and it never takes focus.</p>
+  <h2>Position</h2>
+  <div class="card">
+    <div class="row" style="align-items:center;gap:28px">
+      <div class="screen" id="screen"></div>
+      <div style="display:flex;flex-direction:column;gap:12px;flex:1">
+        <div class="t">Drag it anywhere</div>
+        <div class="d" style="margin-top:-8px">Click the button, then drag the capsule on your screen. It snaps to the nearest corner, edge or centre. Press Enter (or right-click it) when done, Esc to undo.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn p" id="moveBtn">Move on screen</button>
+          <button class="btn" id="resetPos">Reset offset</button></div>
+        <div class="d" id="posInfo"></div>
+      </div>
+    </div>
+    <div class="row"><div class="l"><div class="t">Show on</div><div class="d">Which monitor the indicator lives on</div></div>
+      <div class="seg" data-seg="indicator_monitor"><button data-v="active">Active window</button><button data-v="cursor">Mouse</button><button data-v="primary">Primary</button></div></div>
+  </div>
+  <h2>Appearance</h2>
+  <div class="card">
+    <div class="row col"><div class="t">Theme</div><div class="theme" id="themes"></div></div>
+    <div class="row" id="customRow"><div class="l"><div class="t">Custom colours</div><div class="d">Background and foreground of the capsule</div></div>
+      <div class="sws"><input type="color" data-k="indicator_surface" aria-label="Background colour"><input type="color" data-k="indicator_ink" aria-label="Foreground colour"></div></div>
+    <div class="row"><div class="l"><div class="t">Recording colour</div></div><div class="sws" id="accents"></div></div>
+    <div class="row"><div class="l"><div class="t">Size</div></div>
+      <div class="rng"><input type="range" min="0.7" max="1.8" step="0.05" data-k="indicator_scale"><output></output></div></div>
+    <div class="row"><div class="l"><div class="t">Opacity</div></div>
+      <div class="rng"><input type="range" min="0.4" max="1" step="0.05" data-k="indicator_opacity"><output></output></div></div>
+    <div class="row"><div class="l"><div class="t">Soft shadow</div></div>
+      <label class="sw"><input type="checkbox" data-k="indicator_shadow"><span></span></label></div>
+  </div>
+  <h2>While idle</h2>
+  <div class="card">
+    <div class="row"><div class="l"><div class="t">Style</div><div class="d">What stays on screen while you're not dictating</div></div>
+      <div class="seg" data-seg="indicator_idle"><button data-v="dash">Line</button><button data-v="dot">Dot</button><button data-v="hidden">Hidden</button></div></div>
+    <div class="row"><div class="l"><div class="t">Line length</div></div>
+      <div class="rng"><input type="range" min="10" max="140" step="2" data-k="indicator_idle_length"><output></output></div></div>
+    <div class="row"><div class="l"><div class="t">Thickness</div></div>
+      <div class="rng"><input type="range" min="3" max="14" step="1" data-k="indicator_idle_thickness"><output></output></div></div>
+    <div class="row"><div class="l"><div class="t">Visibility</div></div>
+      <div class="rng"><input type="range" min="0.15" max="1" step="0.05" data-k="indicator_idle_opacity"><output></output></div></div>
+  </div>
+  <p style="margin-top:14px"><button class="btn" id="previewBtn">Preview recording look</button></p>
+</section>
+
+<!-- DICTATION -->
+<section id="dictation">
+  <h1>Dictation</h1>
+  <p class="lead">How your words become text.</p>
+  <div class="card">
+    <div class="row"><div class="l"><div class="t">Clean up speech</div><div class="d">Removes um/uh and applies self-corrections ("Tuesday, no wait, Wednesday")</div></div>
+      <label class="sw"><input type="checkbox" data-k="cleanup"><span></span></label></div>
+    <div class="row"><div class="l"><div class="t">Voice commands</div><div class="d">Punctuation, line breaks, code casing and "scratch that"</div></div>
+      <label class="sw"><input type="checkbox" data-k="voice_commands"><span></span></label></div>
+    <div class="row"><div class="l"><div class="t">Copy when there's no text field</div><div class="d">If nothing can be typed into, your words go to the clipboard instead</div></div>
+      <label class="sw"><input type="checkbox" data-k="clipboard_fallback"><span></span></label></div>
+    <div class="row"><div class="l"><div class="t">Auto-finish hands-free mode</div><div class="d">Stops a locked recording after this much silence. 0 = only when you tap.</div></div>
+      <div class="rng"><input type="range" min="0" max="10" step="1" data-k="auto_stop_silence"><output></output></div></div>
+    <div class="row"><div class="l"><div class="t">Double-tap speed</div><div class="d">Time allowed between the two taps that lock recording</div></div>
+      <div class="rng"><input type="range" min="0.2" max="0.6" step="0.05" data-k="double_tap_window"><output></output></div></div>
+  </div>
+  <h2>Voice commands</h2>
+  <div class="card"><div class="row col"><div class="cmd">
+    <code>new line</code><span>Line break</span>
+    <code>new paragraph</code><span>Blank line between paragraphs</span>
+    <code>bullet point</code><span>Starts a "- " list item</span>
+    <code>comma · colon · question mark …</code><span>Punctuation</span>
+    <code>camel case user name</code><span>userName (also snake, kebab, pascal, constant, all caps)</span>
+    <code>Tuesday, no wait, Friday</code><span>Keeps only the correction</span>
+    <code>scratch that</code><span>Deletes the last thing Flowra typed</span>
+  </div></div></div>
+</section>
+
+<!-- WORDS -->
+<section id="words">
+  <h1>Words &amp; snippets</h1>
+  <p class="lead">Teach Flowra your names and jargon, and phrases that expand into longer text.</p>
+  <h2>Vocabulary</h2>
+  <div class="card"><div class="row col">
+    <div class="d">Comma-separated. Names, brands and technical terms you want spelled exactly.</div>
+    <textarea data-k="vocabulary" placeholder="Vercel, Kubernetes, Shivlive"></textarea>
+  </div></div>
+  <h2>Snippets</h2>
+  <div class="card"><div class="row col">
+    <div class="d">Say the phrase, Flowra types the text.</div>
+    <div id="snips" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div><button class="btn" id="addSnip">Add snippet</button></div>
+  </div></div>
+</section>
+
+<!-- APPS -->
+<section id="apps">
+  <h1>Per-app rules</h1>
+  <p class="lead">Change how Flowra behaves in specific apps.</p>
+  <div class="card"><div class="row col">
+    <div class="d"><b>Paste</b> always types the text · <b>Clipboard</b> always only copies it · <b>Off</b> disables Flowra (handy for games)</div>
+    <div id="rules" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div><button class="btn" id="addRule">Add app</button></div>
+    <div id="recentWrap" style="display:none"><div class="d" style="margin-bottom:6px">Apps you've dictated into</div><div class="chips" id="recent"></div></div>
+  </div></div>
+</section>
+
+<!-- HISTORY -->
+<section id="history">
+  <h1>History</h1>
+  <p class="lead">Everything you've dictated, saved only on this PC.</p>
+  <div class="stats" id="stats"></div>
+  <input class="search" id="q" type="text" placeholder="Search your dictations">
+  <div class="card hist" id="hist"></div>
+</section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const T = new URLSearchParams(location.search).get("t");
+const api = (p, body) => fetch(p + (p.includes("?") ? "&" : "?") + "t=" + T,
+  body ? {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)} : {}).then(r => r.json());
+let S = null, cfg = {};
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("on"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("on"),1400); }
+let pending = {}, timer;
+function save(k, v, now){
+  cfg[k] = v; pending[k] = v; clearTimeout(timer);
+  timer = setTimeout(() => { const p = pending; pending = {}; api("/api/config", p).then(() => toast("Saved")); }, now ? 0 : 280);
+}
+
+const fmt = {
+  sound_volume: v => v + "%", unload_after_idle_minutes: v => +v ? v + " min" : "Off",
+  auto_stop_silence: v => +v ? v + " s" : "Off", double_tap_window: v => (+v).toFixed(2) + " s",
+  indicator_scale: v => Math.round(v * 100) + "%", indicator_opacity: v => Math.round(v * 100) + "%",
+  indicator_idle_opacity: v => Math.round(v * 100) + "%", indicator_idle_length: v => v + " px", indicator_idle_thickness: v => v + " px",
+};
+
+function bind(){
+  $$("[data-k]").forEach(el => {
+    const k = el.dataset.k, v = cfg[k];
+    if (el.type === "checkbox") { el.checked = !!v; el.onchange = () => save(k, el.checked, true); }
+    else if (el.type === "range") {
+      const out = el.parentElement.querySelector("output");
+      el.value = v; out.textContent = (fmt[k] || (x => x))(v);
+      el.oninput = () => { out.textContent = (fmt[k] || (x => x))(el.value); save(k, +el.value); };
+    }
+    else { el.value = v ?? ""; el.oninput = el.onchange = () => save(k, el.value, el.tagName === "SELECT"); }
+  });
+  $$("[data-seg]").forEach(seg => {
+    const k = seg.dataset.seg;
+    const paint = () => seg.querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.v === cfg[k]));
+    seg.querySelectorAll("button").forEach(b => b.onclick = () => { save(k, b.dataset.v, true); paint(); });
+    paint();
+  });
+}
+
+/* hotkey capture */
+const CODE = {ControlRight:"right ctrl",ControlLeft:"left ctrl",AltRight:"right alt",AltLeft:"left alt",ShiftRight:"right shift",
+  ShiftLeft:"left shift",MetaRight:"right windows",MetaLeft:"left windows",CapsLock:"caps lock",ScrollLock:"scroll lock",
+  Pause:"pause",Insert:"insert",Backquote:"`",Space:"space",Enter:"enter",Tab:"tab"};
+const pretty = s => s ? s.split("+").map(p => p.replace(/\b\w/g, c => c.toUpperCase())).join(" + ") : "Not set";
+function keyName(e){
+  if (CODE[e.code]) return CODE[e.code];
+  if (/^F\d+$/.test(e.code)) return e.code.toLowerCase();
+  if (/^Key[A-Z]$/.test(e.code)) return e.code.slice(3).toLowerCase();
+  if (/^Digit\d$/.test(e.code)) return e.code.slice(5);
+  return e.key.toLowerCase();
+}
+function setupKeys(){
+  $$("[data-key]").forEach(b => {
+    const k = b.dataset.key, single = b.hasAttribute("data-single");
+    b.textContent = pretty(cfg[k]);
+    b.onclick = () => {
+      b.classList.add("cap"); b.textContent = single ? "Press a key…" : "Press a shortcut…";
+      api("/api/suspend", {on:true});
+      const done = val => {
+        window.removeEventListener("keydown", kd, true); window.removeEventListener("keyup", ku, true);
+        b.classList.remove("cap"); api("/api/suspend", {on:false});
+        if (val) { save(k, val, true); } b.textContent = pretty(cfg[k]);
+      };
+      const kd = e => {
+        e.preventDefault();
+        if (e.key === "Escape") return done(null);
+        if (single) return done(keyName(e));
+        if (["Control","Alt","Shift","Meta"].includes(e.key)) return;
+        const mods = [e.ctrlKey && "ctrl", e.altKey && "alt", e.shiftKey && "shift", e.metaKey && "windows"].filter(Boolean);
+        if (!mods.length) return; done([...mods, keyName(e)].join("+"));
+      };
+      const ku = e => e.preventDefault();
+      window.addEventListener("keydown", kd, true); window.addEventListener("keyup", ku, true);
+      b.onblur = () => done(null);
+    };
+  });
+}
+
+/* indicator */
+const SPOTS = {}; ["top","middle","bottom"].forEach((v,r) => ["left","center","right"].forEach((h,c) =>
+  SPOTS[`${v}-${h}`] = [8 + c * 100, 6 + r * 55]));
+const THEMES = {graphite:["#121214","#f5f5f7"], light:["#fafafc","#1c1c1e"], midnight:["#0f1b2d","#f4ebdd"], glass:["#3a3c43aa","#ffffff"]};
+const ACCENTS = ["#FF453A","#FF9F0A","#30D158","#3DD6C4","#0A84FF","#BF5AF2","#F5F5F7"];
+function setupIndicator(){
+  const sc = $("#screen"); sc.innerHTML = "";
+  Object.entries(SPOTS).forEach(([k,[x,y]]) => {
+    const b = document.createElement("button"); b.className = "spot" + (cfg.indicator_position === k ? " on" : "");
+    b.style.left = x + "px"; b.style.top = y + "px"; b.title = k.replace("-", " ").replace("middle center", "centre"); b.setAttribute("aria-label", b.title);
+    b.onclick = () => { cfg.indicator_dx = 0; cfg.indicator_dy = 0;
+      api("/api/config", {indicator_position: k, indicator_dx: 0, indicator_dy: 0}); cfg.indicator_position = k; setupIndicator(); };
+    sc.appendChild(b);
+  });
+  $("#posInfo").textContent = `Anchored ${cfg.indicator_position.replace("-", " ")}` +
+    ((cfg.indicator_dx || cfg.indicator_dy) ? ` · offset ${cfg.indicator_dx}, ${cfg.indicator_dy} px` : "");
+  $("#customRow").style.display = cfg.indicator_theme === "custom" ? "" : "none";
+  const th = $("#themes"); th.innerHTML = "";
+  const all = {...THEMES, custom: [cfg.indicator_surface, cfg.indicator_ink]};
+  Object.entries(all).forEach(([k,[bg,ink]]) => {
+    const b = document.createElement("button"); b.className = cfg.indicator_theme === k ? "on" : "";
+    const hs = [5,9,13,8,11,6,10];
+    b.innerHTML = `<span class="pill" style="background:${bg};border:1px solid #8883"><b style="background:${cfg.indicator_accent}"></b>` +
+      hs.map(h => `<i style="height:${h}px;background:${ink}"></i>`).join("") + `</span>${k[0].toUpperCase() + k.slice(1)}`;
+    b.onclick = () => { save("indicator_theme", k, true); setupIndicator(); };
+    th.appendChild(b);
+  });
+  const ac = $("#accents"); ac.innerHTML = "";
+  ACCENTS.forEach(c => {
+    const b = document.createElement("button"); b.className = "swc" + (cfg.indicator_accent.toUpperCase() === c ? " on" : "");
+    b.style.background = c; b.title = c; b.setAttribute("aria-label", "Color " + c);
+    b.onclick = () => { save("indicator_accent", c, true); setupIndicator(); };
+    ac.appendChild(b);
+  });
+  const ci = document.createElement("input"); ci.type = "color"; ci.value = cfg.indicator_accent; ci.title = "Custom colour";
+  ci.setAttribute("aria-label", "Custom recording colour");
+  ci.onchange = () => { save("indicator_accent", ci.value.toUpperCase(), true); setupIndicator(); };
+  ac.appendChild(ci);
+}
+
+/* list editors */
+function kvEditor(box, entries, makeRow, onChange){
+  box.innerHTML = "";
+  entries.forEach((e, i) => box.appendChild(makeRow(e, i)));
+}
+function renderSnips(){
+  const list = Object.entries(cfg.replacements || {});
+  const box = $("#snips"); box.innerHTML = "";
+  if (!list.length) box.innerHTML = `<div class="d">No snippets yet. Try "my email" → your address.</div>`;
+  list.forEach(([k, v], i) => {
+    const r = document.createElement("div"); r.className = "kv";
+    r.innerHTML = `<input type="text" placeholder="When I say…"><span class="arrow">→</span><input type="text" placeholder="Type this"><button class="x" aria-label="Remove">×</button>`;
+    const [a, b] = r.querySelectorAll("input"); a.value = k; b.value = v;
+    const commit = () => { const o = {}; $$("#snips .kv").forEach(row => { const [x,y] = row.querySelectorAll("input"); if (x.value.trim()) o[x.value.trim()] = y.value; }); save("replacements", o); };
+    a.oninput = b.oninput = commit;
+    r.querySelector(".x").onclick = () => { r.remove(); commit(); setTimeout(renderSnips, 300); };
+    box.appendChild(r);
+  });
+}
+function renderRules(){
+  const list = Object.entries(cfg.app_rules || {});
+  const box = $("#rules"); box.innerHTML = "";
+  if (!list.length) box.innerHTML = `<div class="d">No rules. Flowra decides automatically.</div>`;
+  list.forEach(([exe, mode]) => {
+    const r = document.createElement("div"); r.className = "kv";
+    r.innerHTML = `<input type="text" placeholder="app.exe"><span class="arrow">→</span><select><option value="paste">Paste</option><option value="clipboard">Clipboard</option><option value="off">Off</option></select><button class="x" aria-label="Remove">×</button>`;
+    const inp = r.querySelector("input"), sel = r.querySelector("select"); inp.value = exe; sel.value = mode;
+    const commit = () => { const o = {}; $$("#rules .kv").forEach(row => { const x = row.querySelector("input").value.trim().toLowerCase(); if (x) o[x] = row.querySelector("select").value; }); save("app_rules", o); };
+    inp.oninput = commit; sel.onchange = commit;
+    r.querySelector(".x").onclick = () => { r.remove(); commit(); setTimeout(renderRules, 300); };
+    box.appendChild(r);
+  });
+  const apps = (S.stats.apps || []).filter(a => !(a in (cfg.app_rules || {})));
+  $("#recentWrap").style.display = apps.length ? "" : "none";
+  $("#recent").innerHTML = "";
+  apps.forEach(a => { const c = document.createElement("button"); c.className = "chip"; c.textContent = "+ " + a;
+    c.onclick = () => { cfg.app_rules = {...cfg.app_rules, [a]: "clipboard"}; save("app_rules", cfg.app_rules, true); renderRules(); };
+    $("#recent").appendChild(c); });
+}
+
+/* history */
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+async function loadHistory(){
+  const items = await api("/api/history?q=" + encodeURIComponent($("#q").value));
+  const box = $("#hist");
+  if (!items.length) { box.innerHTML = `<div class="empty">${$("#q").value ? "No matches." : "Your dictations will appear here."}</div>`; return; }
+  box.innerHTML = items.map((h, i) => `<div class="h"><div><p>${esc(h.text)}</p><small>${esc(h.ts)}${h.app ? " · " + esc(h.app) : ""}${h.to === "clipboard" ? " · copied" : ""}</small></div>
+    <button class="btn copy" data-i="${i}">Copy</button></div>`).join("");
+  box.querySelectorAll(".copy").forEach(b => b.onclick = () => { navigator.clipboard.writeText(items[b.dataset.i].text); toast("Copied"); });
+}
+function renderStats(){
+  const s = S.stats, n = x => x.toLocaleString();
+  $("#stats").innerHTML = [[n(s.words),"words dictated"],[n(s.today_words),"words today"],[s.wpm ? s.wpm : "–","words per minute"],
+    [s.saved_min >= 60 ? (s.saved_min/60).toFixed(1) + " h" : s.saved_min + " min","saved vs typing"]]
+    .map(([v,l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
+}
+
+/* routing */
+function route(){
+  const id = (location.hash || "#general").slice(1);
+  $$("section").forEach(s => s.classList.toggle("on", s.id === id));
+  $$("nav a").forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + id));
+  if (id === "history") loadHistory();
+}
+window.onhashchange = route;
+
+const LANGS = [["","Auto-detect"],["en","English"],["hi","Hindi"],["es","Spanish"],["fr","French"],["de","German"],["pt","Portuguese"],
+  ["it","Italian"],["nl","Dutch"],["ja","Japanese"],["ko","Korean"],["zh","Chinese"],["ar","Arabic"],["ru","Russian"],["bn","Bengali"],
+  ["mr","Marathi"],["gu","Gujarati"],["ta","Tamil"],["te","Telugu"],["ur","Urdu"]];
+
+async function init(){
+  S = await api("/api/state"); cfg = S.config;
+  $("#mic").innerHTML = `<option value="">System default</option>` + S.mics.map(m => `<option>${esc(m)}</option>`).join("");
+  $("#model").innerHTML = S.models.map(m => `<option value="${m.id}">${m.label}</option>`).join("");
+  const note = () => $("#modelNote").textContent = (S.models.find(m => m.id === cfg.model) || {}).note || "";
+  $("#model").addEventListener("change", () => setTimeout(note));
+  $("#lang").innerHTML = LANGS.map(([v,l]) => `<option value="${v}">${l}</option>`).join("");
+  bind(); note(); setupKeys(); setupIndicator(); renderSnips(); renderRules(); renderStats(); route(); paintStatus(S);
+}
+function paintStatus(s){
+  const st = $("#status"); st.classList.toggle("ok", s.ready);
+  st.querySelector("span").textContent = s.ready ? `Ready · ${s.active || "on this PC"}` : (s.status || "Loading model…");
+}
+$("#addSnip").onclick = () => { cfg.replacements = {...cfg.replacements, "": ""}; renderSnips(); const i = $$("#snips input"); i[i.length-2]?.focus(); };
+$("#addRule").onclick = () => { cfg.app_rules = {...cfg.app_rules, "": "clipboard"}; renderRules(); const i = $$("#rules input"); i[i.length-1]?.focus(); };
+$("#previewBtn").onclick = () => api("/api/preview", {});
+$("#moveBtn").onclick = () => { api("/api/move", {on:true}); toast("Drag the capsule on your screen"); };
+$("#resetPos").onclick = () => { cfg.indicator_dx = 0; cfg.indicator_dy = 0; api("/api/config", {indicator_dx:0, indicator_dy:0}); setupIndicator(); };
+["indicator_surface","indicator_ink"].forEach(k => document.querySelector(`[data-k=${k}]`).addEventListener("change", () => setTimeout(setupIndicator, 50)));
+let qt; $("#q").oninput = () => { clearTimeout(qt); qt = setTimeout(loadHistory, 150); };
+setInterval(async () => { try { const s = await api("/api/state"); paintStatus(s); S.stats = s.stats; renderStats();
+  const moved = ["indicator_position","indicator_dx","indicator_dy"].some(k => s.config[k] !== cfg[k]);
+  if (moved) { ["indicator_position","indicator_dx","indicator_dy"].forEach(k => cfg[k] = s.config[k]); setupIndicator(); } } catch(e){} }, 1500);
+init();
+</script>
+</body>
+</html>

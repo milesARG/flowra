@@ -1,0 +1,28 @@
+Flowra 1.0.0 - local voice dictation for Windows
+
+Flowra runs speech recognition entirely on your computer. Your audio and text are
+never sent anywhere. On first launch it downloads an open speech model from
+Hugging Face (Systran/faster-whisper), after which it works offline.
+
+Your settings and dictation history are stored in %APPDATA%\Flowra.
+
+Flowra includes the following third-party software:
+
+- OpenAI Whisper models - MIT License
+- faster-whisper (SYSTRAN) - MIT License
+- CTranslate2 (OpenNMT) - MIT License
+- Silero VAD - MIT License
+- ONNX Runtime (Microsoft) - MIT License
+- NumPy - BSD License
+- Pillow - MIT-CMU License
+- sounddevice / PortAudio - MIT License
+- keyboard (boppreh) - MIT License
+- pyperclip - BSD License
+- pystray - LGPL-3.0 License
+- comtypes - MIT License
+- Python - PSF License
+- NVIDIA cuBLAS and cuDNN runtime libraries - distributed under the NVIDIA
+  Software License Agreement as redistributable components.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED. By continuing you accept these terms.
