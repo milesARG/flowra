@@ -10,6 +10,11 @@
   <img src="docs/media/waveform.gif" width="420" alt="Flowra's live waveform indicator">
 </p>
 
+<p align="center">
+  <a href="https://github.com/milesARG/flowra/releases/latest"><b>Download for Windows</b></a>
+  &nbsp;·&nbsp; MIT licensed &nbsp;·&nbsp; Runs on your PC
+</p>
+
 ---
 
 ## How it works
@@ -118,6 +123,10 @@ selftest.py          text clean-up tests:  python selftest.py
 assets/              logo and icons (make_icons.py rebuilds them)
 ```
 
-## Third-party software
+## Install
 
-See [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt).
+Download `Flowra-Setup-1.0.0.exe` from [Releases](https://github.com/milesARG/flowra/releases/latest) and run it. The installer is unsigned, so on the SmartScreen prompt choose **More info → Run anyway**. Flowra then appears in the system tray.
+
+## License
+
+[MIT](LICENSE). Third-party components are listed in [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt).
